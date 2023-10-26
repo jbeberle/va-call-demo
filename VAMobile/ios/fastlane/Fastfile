@@ -1,0 +1,222 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+require "spaceship"
+
+default_platform(:ios)
+
+platform :ios do
+  before_all do |lane, options|
+    setup_circle_ci
+    import('../../fastfiles/slack_commands/fastfile')
+    version = options[:version]
+    app_store_connect_api_key(
+              key_id: ENV['APPSTORE_CONNECT_API_KEY_ID'],
+              issuer_id: ENV['APPSTORE_CONNECT_API_KEY_ISSUER_ID'],
+              key_filepath: ENV['APPSTORE_CONNECT_FILEPATH'],
+              in_house: false
+            )
+  end
+
+  desc "Push a new internal QA build to TestFlight"
+  lane :qa do |options|
+    puts('Begin QA lane' )
+    ensure_xcode_version(version: "14", strict: false)
+    notes = options[:notes]
+    update_version(options[:version])
+    update_info_plist(xcodeproj: "VAMobile.xcodeproj", plist_path:"VAMobile/Info.plist" , display_name: "VA-QA")
+    sign
+    build("QA")
+    notes = "New QA version for " + Time.new.strftime("%m.%d.%Y") if notes.to_s.empty?
+    upload_tf(notes, "Development Team")
+    tag_build(lane_context[SharedValues::BUILD_NUMBER])
+    message = "New QA build successfully uploaded to TestFlight Group - Development Team"
+    slack_build_success(lane_context[SharedValues::BUILD_NUMBER], lane_context[SharedValues::VERSION_NUMBER], "QA", message, "iOS", ENV['SLACK_THREAD_TS'])
+  end
+
+  desc "Lane for non-automated build calls. Should only run from a local machine and requires signing certs"
+  lane :on_demand do |options|
+    puts "on demand run"
+    ensure_xcode_version(version: "14", strict: false)
+    notes = options[:notes]
+    datetime = Time.new.strftime("%m-%d-%Y %I:%M %p %Z")
+    update_version(options[:version])
+    sign
+    build("QA")
+
+    tf_group = options[:tfGroup].empty? ? "Development Team" : options[:tfGroup]
+
+    if notes.to_s.empty?
+      notes = "New On Demand QA version for " + datetime
+    elsif notes.start_with?("feature-build-")
+      notes = "Feature Build: #{notes.gsub('feature-build-','').gsub('-',' ')} - " + datetime
+    end
+
+    puts notes
+    upload_tf(notes, tf_group)
+    message = "New On Demand build successfully uploaded to TestFlight Group " + tf_group
+    slack_build_success(lane_context[SharedValues::BUILD_NUMBER], lane_context[SharedValues::VERSION_NUMBER], "On Demand", message, "iOS", ENV['SLACK_THREAD_TS'])
+  end
+
+  desc "Deploy a RC new version to TestFlight"
+  lane :rc do |options|
+    puts('Begin RC lane' )
+    ensure_xcode_version(version: "14", strict: false)
+    update_version(options[:version])
+    update_info_plist(xcodeproj: "VAMobile.xcodeproj", plist_path:"VAMobile/Info.plist" , display_name: "VA-RC")
+    sign
+    build("RC")
+    rcVersion = "#{Gem::Version.new(lane_context[SharedValues::VERSION_NUMBER]).bump}.0"
+    notes = "Release Candidate build for version #{rcVersion} - #{Time.new.strftime("%m.%d.%Y")}"
+    upload_tf(notes, "Development Team")
+    tag_build(lane_context[SharedValues::BUILD_NUMBER])
+    message = "New RC for #{rcVersion} successfully uploaded to TestFlight Group - Development Team"
+    slack_build_success(lane_context[SharedValues::BUILD_NUMBER], lane_context[SharedValues::VERSION_NUMBER], "Release Candidate", message, "iOS", ENV['SLACK_THREAD_TS'])
+  end
+
+  desc "Build new Production build and upload to App Store for review"
+  lane :review do |options|
+    puts("Begin Review Lane")
+    ensure_xcode_version(version: "14", strict: false)
+    update_version(options[:version])
+    sign
+    build
+    upload_app_store
+    tag_build(lane_context[SharedValues::BUILD_NUMBER])
+    message = "New Production build successfully uploaded to App Store for review"
+    slack_sent_for_review(lane_context[SharedValues::BUILD_NUMBER], lane_context[SharedValues::VERSION_NUMBER], message, "iOS", ENV['SLACK_THREAD_TS'])
+  end
+
+  desc "Promote the release Awaiting Developer Release to App Store"
+  lane :release do
+    begin
+      app = Spaceship::ConnectAPI::App.find("gov.va.vamobileapp")
+      version = app.get_pending_release_app_store_version
+      unless version.nil?
+        Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: version.id)
+        upload_deobfuscation_file(version.version_string)
+        slack_release_success(version.version_string, "iOS")
+      end
+    rescue => e
+      slack_release_error(version, e)
+    end
+  end
+
+  desc "Push new demo version to TestFlight"
+  lane :demo do
+    puts('Begin Demo lane')
+  end
+
+  after_all do |lane, options|
+    # This block is called, only if the executed lane was successful
+  end
+
+  error do |lane, exception, options|
+    puts("ERROR REPORT")
+    slack_build_error(exception, options[:version], "iOS Build Failed", "iOS", ENV['SLACK_THREAD_TS'])
+  end
+
+
+  ### UTILITIES ###
+
+  # updates the build and version number
+  def update_version (version)
+    puts('version: ' + version.to_s)
+    # get the latest version of the app in test flight.
+    latest_testflight_build_number
+    # set the version to the what is in app store, just in case there was drift
+    increment_version_number(version_number: lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION])
+    # increment the build app_store_build_number
+    increment_build_number(build_number: lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] + 1, xcodeproj: ENV['IOS_PROJ_FILE'])
+    if version=='qa'
+    # if its a qa version, we need to check the app store because it will fail if we try and upload
+    # the same version as the live version to test flight
+      app = Spaceship::ConnectAPI::App.find("gov.va.vamobileapp")
+      liveVersion = Gem::Version.new(app.get_live_app_store_version.version_string)
+      latestVersion = Gem::Version.new(app.get_latest_app_store_version.version_string)
+      max = [liveVersion, latestVersion].max
+      tfVersion = Gem::Version.new(lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION])
+      if max == tfVersion
+        increment_version_number(bump_type: "patch")
+      elsif max > tfVersion
+        increment_version_number(version_number: max.to_s)
+        increment_version_number(bump_type: "patch")
+      end
+    else
+      # non-qa build should use the version from the tag
+      increment_version_number(version_number: /\d+\.\d+\.\d+/.match(version).to_s)
+    end
+  end
+
+  desc "Tagging iOS build number"
+  def tag_build(build)
+    begin
+      tag = "ios-build-" + build.to_s
+      puts "Tagging commit with " + tag
+      add_git_tag(tag: tag)
+      push_git_tags(tag: tag)
+    rescue => e
+        puts e.to_s
+      slack_github_error(e, "Error tagging iOS build", "iOS", ENV['SLACK_THREAD_TS'])
+    end
+  end
+
+  desc "Sign the build"
+  def sign
+    match(type: "appstore", readonly: true)
+  end
+
+  desc "Build the app for upload"
+  def build(config = "Release")
+    gym(
+      workspace: "VAMobile.xcworkspace",
+      scheme: ENV['IOS_SCHEME'],
+      configuration: config,
+      silent: true,
+      export_method: "app-store",
+    )
+  end
+
+  def upload_tf(test_notes, group)
+    upload_to_testflight(
+      api_key: lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      beta_app_review_info: {
+          notes: test_notes
+        },
+      distribute_external: true,
+      notify_external_testers: true,
+      groups: [group], # make customizable
+      changelog: test_notes
+    )
+  end
+
+  def upload_app_store
+    deliver(
+        submit_for_review: true,
+        automatic_release: false,
+        force: true,
+        overwrite_screenshots: true,
+        run_precheck_before_submit: false,
+        submission_information: {
+          add_id_info_uses_idfa: false
+        },
+      )
+  end
+
+  def upload_deobfuscation_file(version)
+    download_dsyms(version: version)
+    upload_symbols_to_crashlytics(dsym_path: "VAMobile.app.dSYM.zip", app_id: ENV['FIREBASE_IOS_APP_ID'])
+    clean_build_artifacts
+  end
+end
