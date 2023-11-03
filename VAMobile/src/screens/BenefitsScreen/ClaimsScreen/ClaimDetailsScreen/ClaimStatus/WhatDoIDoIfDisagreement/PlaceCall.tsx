@@ -10,6 +10,7 @@ import { a11yLabelVA } from 'utils/a11yLabel'
 import { useExternalLink, useTheme } from 'utils/hooks'
 import getEnv from 'utils/env'
 
+
 const { LINK_URL_DECISION_REVIEWS } = getEnv()
 
 type PlaceCallProps = StackScreenProps<BenefitsStackParamList, 'PlaceCall'>
@@ -22,6 +23,21 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
     const onDecisionReview = async (): Promise<void> => {
         //launchExternalLink(LINK_URL_DECISION_REVIEWS, { claim_id: claimID, claim_type: claimType, claim_step: claimStep })
     }
+
+    console.log("Hi!")
+    const websocket = new WebSocket('ws://10.0.0.242:8080/socket')
+    console.log("connected to websocket")
+    console.log(websocket)
+    // websocket.onopen(() => console.log("web Socket got connected!!!!"))
+    websocket.addEventListener("open", () => console.log("web Socket got connected!!!!"))
+    websocket.addEventListener("message", (message) => console.log("web Socket got a message!!!!"))
+    websocket.addEventListener("close", () => console.log("web Socket got closed!!!!"))
+    websocket.addEventListener("error", (err) => {
+       console.log("web Socket got an error!!!!");
+       console.log(err);
+       });
+
+
 
     const text = t('claimDetails.placeCall.calling')
 

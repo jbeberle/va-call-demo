@@ -1,0 +1,180 @@
+# Xcode
+!**/*.xcodeproj
+!**/*.pbxproj
+!**/*.xcworkspacedata
+!**/*.xcsettings
+!**/*.xcscheme
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace
+.yarn
+.tool-versions
+
+# Gradle
+/build/
+/packages/rn-tester/android/app/build/
+/packages/rn-tester/android/app/gradle/
+/packages/rn-tester/android/app/gradlew
+/packages/rn-tester/android/app/gradlew.bat
+/ReactAndroid/build/
+/ReactAndroid/gradle/
+/ReactAndroid/gradlew
+/ReactAndroid/gradlew.bat
+
+# Buck
+.buckd
+buck-out
+/.lsp.buckd
+/.lsp-buck-out
+/ReactAndroid/src/main/jni/prebuilt/lib/
+/ReactAndroid/src/main/gen
+
+# Android Studio
+.project
+.settings
+.classpath
+
+# Watchman
+.watchmanconfig
+
+# Android
+.idea
+.gradle
+local.properties
+*.iml
+/android/
+**/android/tmp
+**/android/app/src/main/assets/
+
+# Android Build
+**/android/vendor
+
+# Node
+node_modules
+*.log
+.nvm
+/bots/node_modules/
+
+# OS X
+.DS_Store
+
+# Test generated files
+/ReactAndroid/src/androidTest/assets/AndroidTestBundle.js
+*.js.meta
+
+/coverage
+/third-party
+
+# Root dir shouldn't have Xcode project
+/*.xcodeproj
+
+# ReactCommon subdir shouldn't have Xcode project
+/ReactCommon/**/*.xcodeproj
+/packages/rn-tester/build
+/packages/rn-tester/android/app/build/*
+
+# Libs that shouldn't have Xcode project
+/Libraries/FBLazyVector/**/*.xcodeproj
+/Libraries/FBReactNativeSpec/**/*.xcodeproj
+/Libraries/RCTRequired/**/*.xcodeproj
+/React/CoreModules/**/*.xcodeproj
+/packages/react-native-codegen/**/*.xcodeproj
+
+# CocoaPods
+/template/ios/Pods/
+/template/ios/Podfile.lock
+/packages/rn-tester/Gemfile.lock
+
+# Ignore RNTester specific Pods, but keep the __offline_mirrors__ here.
+/packages/rn-tester/Pods/*
+!/packages/rn-tester/Pods/__offline_mirrors__
+
+# react-native-codegen
+/packages/react-native-codegen/lib
+/ReactCommon/fabric/components/rncore/
+/schema-native-modules.json
+/schema-rncore.json
+
+# Visual studio
+.vscode
+.vs
+
+# Android memory profiler files
+*.hprof
+
+coverage
+
+#iOS build
+**/ios/output
+**/ios/vendor
+
+# Xcode
+#
+build/
+
+# node.js
+#
+npm-debug.log
+yarn-error.log
+
+# BUCK
+buck-out/
+\.buckd/
+*.keystore
+!debug.keystore
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/
+
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+*/fastlane/README.md
+
+# CircleCI
+  # CCI installs all the deps including yarn at the project root and we don't want to check this in
+**/package-lock.json
+
+# Bundle artifact
+*.jsbundle
+/VAMobile/env/script.env
+/VAMobile/env/.env
+/VAMobile/ios/VAMobile/GoogleService-Info.plist
+/VAMobile/android/google-services.json
+
+# Google Services
+**/google-services.json
+**/GoogleService-Info.plist
+
+/VAMobile/ios/AppStoreConnectKey.p8
+/VAMobile/ios/Flagship_Mobile_App.mobileprovision
+/VAMobile/ios/distribution.p12
+/VAMobile/ios/GoogleService-Info.plist
+/VAMobile/android/app/release
+/VAMobile/android/keystore
+/VAMobile/android/keys/*
+/VAMobile/ios/fastlane/Preview.html
+**/fastlane/report.xml
+/VAMobile/ios/fastlane/README.md
+/VAMobile/android/fastlane/README.md
+
+# Detox
+/VAMobile/artifacts
+/VAMobile/e2e/tests/__image_snapshots__
