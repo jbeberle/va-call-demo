@@ -1,7 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import React, { FC, ReactElement } from 'react'
 
-import { Box, ClickForActionLink, LinkButtonProps, LinkTypeOptionsConstants, LinkUrlIconType, TextArea, TextView } from 'components'
+import {
+    Box,
+    ClaimMetaData,
+    ClickForActionLink,
+    LinkButtonProps,
+    LinkTypeOptionsConstants,
+    LinkUrlIconType,
+    TextArea,
+    TextView
+} from 'components'
 import { Events } from 'constants/analytics'
 import { NAMESPACE } from 'constants/namespaces'
 import { a11yHintProp, testIdProps } from 'utils/accessibility'
@@ -35,6 +44,7 @@ const NeedHelpData: FC<NeedHelpDataProps> = ({ isAppeal, claimId, claimType, cla
       linkType: LinkTypeOptionsConstants.url,
       linkUrlIconType: LinkUrlIconType.Arrow,
       a11yLabel: a11yLabelVA(t('appealDetails.visitVAGov')),
+        claimMetaData: {claimId, claimType} as ClaimMetaData,
     }
 
     return (
@@ -65,12 +75,19 @@ const NeedHelpData: FC<NeedHelpDataProps> = ({ isAppeal, claimId, claimType, cla
         a11yLabel: a11yLabelID(t('8008271000')),
         numberOrUrlLink: 'http://www.google.com',
         linkType: LinkTypeOptionsConstants.url,
+        claimMetaData: {
+            claimId, claimType, claimPhase
+        } as ClaimMetaData,
         fireAnalytic: () => {
             if (claimId && claimType && claimPhase) {
                 logAnalyticsEvent(Events.vama_claim_call(claimId, claimType, claimPhase))
             }
         },
     }
+
+    console.log('NeedHelpData:  clickToCallProps')
+    console.log(clickToCallProps)
+
 
   return (
     <TextArea>

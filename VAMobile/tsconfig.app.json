@@ -2,8 +2,11 @@
 	"extends": "./tsconfig",
 	"compilerOptions": {
 		"isolatedModules": true,
-		"types": []
-	},
+		"types": [],
+      "lib": [
+        "dom"
+      ]
+    },
 	"exclude": [
 		"__tests__",
 		"src/testUtils.tsx",

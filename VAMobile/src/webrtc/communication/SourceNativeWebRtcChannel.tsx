@@ -34,12 +34,7 @@ export const SourceNativeWebRtcChannel = (props: CallScreenPropType) => {
 
     useEffect(() => {
 
-        // // make a call to remote peer over signalling
-        socket.on('makeCall', (...data: [rtcMessage: any, callerId: any, offer:any])
-        {
-            remoteRTCMessage.current = data[0]
-            otherUserId = data[1]
-        })
+
             // create SDP Offer
             const offer = await peerConnection!.current.createOffer(null);
 

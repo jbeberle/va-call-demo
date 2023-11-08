@@ -101,17 +101,17 @@ export const WebrtcRoomScreen = (props: CallScreenPropType) => {
                         streamURL={localStream.toURL()}
                     />
                 ) : null}
-                {remoteStream ? (
-                    <RTCView
-                        objectFit={"cover"}
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#050A0E",
-                            marginTop: 8,
-                        }}
-                        streamURL={remoteStream.toURL()}
-                    />
-                ) : null}
+                {/*{remoteStream ? (*/}
+                {/*    <RTCView*/}
+                {/*        objectFit={"cover"}*/}
+                {/*        style={{*/}
+                {/*            flex: 1,*/}
+                {/*            backgroundColor: "#050A0E",*/}
+                {/*            marginTop: 8,*/}
+                {/*        }}*/}
+                {/*        streamURL={remoteStream.toURL()}*/}
+                {/*    />*/}
+                {/*) : null}*/}
                 <View
                     style={{
                         marginVertical: 12,

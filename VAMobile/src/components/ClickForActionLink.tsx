@@ -43,6 +43,12 @@ export type CalendarMetaData = {
   longitude: number
 }
 
+export type ClaimMetaData = {
+  claimId?: string
+  claimType?: string
+  claimPhase?: string
+}
+
 export type ActionLinkMetaData = CalendarMetaData
 
 /**
@@ -64,6 +70,8 @@ export type LinkButtonProps = AccessibilityProps & {
   /** object with additional data needed to perform the given action */
   metaData?: ActionLinkMetaData
 
+  claimMetaData?: ClaimMetaData
+
   /** Accessibility label for the link, mandatory for every element with a link role */
   a11yLabel: string
 
@@ -84,6 +92,7 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
   numberOrUrlLink,
   linkUrlIconType,
   metaData,
+    claimMetaData,
   a11yLabel,
   fireAnalytic,
   colorOverride,
@@ -93,6 +102,8 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
   const theme = useTheme()
   const launchExternalLink = useExternalLink()
   const navigateTo = useRouteNavigation()
+  console.log('ClickForActionLink Claim Meta=')
+  console.log(claimMetaData)
 
   const onCalendarPress = async (): Promise<void> => {
     const { title, endTime, startTime, location, latitude, longitude } = metaData as ActionLinkMetaData
@@ -111,6 +122,7 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
     if (fireAnalytic) {
       fireAnalytic()
     }
+    const { claimId, claimType, claimPhase } = claimMetaData as ClaimMetaData
 
     if (linkType === LinkTypeOptionsConstants.calendar) {
       await onCalendarPress()
@@ -125,11 +137,10 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
     }
 
     console.log(`openUrlText = ${openUrlText}`)
-    navigateTo('PlaceCall', {
-      claimID: "1",
-      claimType: "2",
-      claimStep: "3",
-    })()
+    console.log(`claimId = ${claimId}`)
+    console.log(`claimType = ${claimType}`)
+    console.log(`claimPhase = ${claimPhase}`)
+    navigateTo('PlaceCall', claimMetaData) ()
 
     // ex. numbers: tel:${8008271000}, sms:${8008271000} (number must have no dashes)
     // ex. url: https://google.com (need https for url)
