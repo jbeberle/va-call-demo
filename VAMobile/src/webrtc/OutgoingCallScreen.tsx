@@ -21,19 +21,20 @@ export const OutgoingCallScreen = (props: CallScreenPropType) => {
     let callerId: string = props.sourceCallerId
     let otherUserId: string | null = props.destCallerId
     const socket = props.socket;
+    const remoteRTCMessage = props.remoteRTCMessage;
     console.log("In OutgoingCallScreen")
     const peerConnection = props.peerConnection
     console.log("peerConnection=")
     console.log(peerConnection)
 
     const init = async () => {
-        console.log("Creating offer")
-        console.log(peerConnection)
-        const offer = await peerConnection!.createOffer();
+        //console.log("Creating offer")
+        //console.log(peerConnection)
+        //const offer = await peerConnection!.createOffer();
 
-        console.log("setting local description")
+        //console.log("setting local description")
         // set SDP offer as localDescription for peerConnection
-        peerConnection!.setLocalDescription(offer);
+        //peerConnection!.setLocalDescription(offer);
 
         console.log("emitting makeCall")
         socket.addEventListener('message', (ev) => {
@@ -43,9 +44,29 @@ export const OutgoingCallScreen = (props: CallScreenPropType) => {
                 console.log('accepted call!!!')
                 console.log(data)
                 console.log(ev.data)
+                remoteRTCMessage.current = data.rtcMessage;
+                peerConnection?.setRemoteDescription(
+                    new RTCSessionDescription(remoteRTCMessage.current!)
+                );
+
+                sendOffer();
+
+
                 setType("ACCEPTED_CALL")
             }
         })
+
+        const sendOffer = async (): Promise<any> => {
+            const sessionDescription = await peerConnection!.createOffer();
+            await peerConnection!.setLocalDescription(sessionDescription);
+            socket.send(JSON.stringify(
+                {
+                    message: 'offer',
+                    calleeId: props.destCallerId,
+                    rtcMessage: sessionDescription,
+                }
+            ))
+        }
 
         // socket.send(JSON.stringify({
         //     "message": "makeCall",

@@ -1,14 +1,15 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
     Platform,
     Text,
     TouchableOpacity,
-    TouchableWithoutFeedback,
+    TouchableWithoutFeedback, useRef,
     View,
 } from 'react-native';
 import {RTCPeerConnection} from "react-native-webrtc";
+import {MessagesInfo} from "./components/ChatScreen";
 
 
 export type CallScreenPropType = {
@@ -19,6 +20,12 @@ export type CallScreenPropType = {
     socket: WebSocket
     peerConnection: RTCPeerConnection | null
     setPeerConnection: (peerConnection: RTCPeerConnection) => void
+    remoteRTCMessage: React.MutableRefObject<null>;
+    localStream?: MediaStream
+    setLocalStream?: (stream: MediaStream) => void;
+    sendUserResponse?: string
+    setSendUserResponse?: (string) => void
+    messages?: MessagesInfo[];
 }
 
 
@@ -59,8 +66,7 @@ export const JoinScreen = (props: CallScreenPropType) => {
                             {/*        fontSize: 18,*/}
                             {/*        color: '#D0D4DD',*/}
                             {/*    }}>*/}
-                            {/*    Your Caller ID*/}
-                            {/*</Text>*/}
+                            {/*    Your Call{/*</Text>*/}
                             <View
                                 style={{
                                     flexDirection: 'row',
