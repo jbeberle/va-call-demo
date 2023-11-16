@@ -3832,22 +3832,6 @@
   resolved "https://registry.yarnpkg.com/@types/react-native-incall-manager/-/react-native-incall-manager-4.0.2.tgz#6fce7e03e8b01ca5d972c2e9d49dd98eabe7bf3d"
   integrity sha512-BnF4Hy/IFx3MfAdAi1tLdB1L2DOizniVjAOPWG8ClmsnlNSM/Ha6cQtLAcIn3dAsBKXc+YjoUa9u/SbvkMssyw==
 
-"@types/react-native-webrtc@^1.75.6":
-  version "1.75.6"
-  resolved "https://registry.yarnpkg.com/@types/react-native-webrtc/-/react-native-webrtc-1.75.6.tgz#ca3acccd6ebb9701ff4d7920594d2e4ad1688917"
-  integrity sha512-l5DO9PvYVjnRDrfNHeLon3Tyu0vpj7rDl6CKR51Nm2hPSBpyXe6dgiVvlr6S/mac7eqpqqpNndkwYpBiKvkO/g==
-  dependencies:
-    "@types/react" "*"
-    "@types/react-native" "*"
-
-"@types/react-native@*":
-  version "0.72.5"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.72.5.tgz#33a0d0c3c724395ee05bb37255937dcb3fae6d5f"
-  integrity sha512-HAt+EC576kbyg3+qruzbOLgVhgDHTHJ3d3rTkWRJ0wukze+l3ldWUkh1IarERHqsUlWwmkuYu0+4TQE5y1EjwA==
-  dependencies:
-    "@react-native/virtualized-lists" "^0.72.4"
-    "@types/react" "*"
-
 "@types/react-native@0.72.1":
   version "0.72.1"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.72.1.tgz#a732ba4fabc15eee26cfbe4b00a12baa3a86cf44"
@@ -5863,7 +5847,7 @@ base-64@0.1.0:
   resolved "https://registry.yarnpkg.com/base-64/-/base-64-0.1.0.tgz#780a99c84e7d600260361511c4877613bf24f6bb"
   integrity sha1-eAqZyE59YAJgNhURxId2E78k9rs=
 
-base64-js@1.5.1, base64-js@^1.1.2, base64-js@^1.2.3, base64-js@^1.3.1, base64-js@^1.5.1:
+base64-js@^1.1.2, base64-js@^1.2.3, base64-js@^1.3.1, base64-js@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
@@ -8153,11 +8137,6 @@ event-pubsub@4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/event-pubsub/-/event-pubsub-4.3.0.tgz#f68d816bc29f1ec02c539dc58c8dd40ce72cb36e"
   integrity sha512-z7IyloorXvKbFx9Bpie2+vMJKKx1fH1EN5yiTfp8CiLOTptSYy1g8H4yDpGlEdshL1PBiFtBHepF2cNsqeEeFQ==
-
-event-target-shim@6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-6.0.2.tgz#ea5348c3618ee8b62ff1d344f01908ee2b8a2b71"
-  integrity sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==
 
 event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   version "5.0.1"
@@ -13534,15 +13513,6 @@ react-native-webp-format@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/react-native-webp-format/-/react-native-webp-format-1.2.0.tgz#6c7cbed4cdc8247711c7d7f656d0d4f739836c82"
   integrity sha512-tUL/AbM6QwUsxsGutJ1bN4RW8JdD2w5Mpj+An4DvYKkm0bKHbODj7U7gI1+8X68GqJWOy+Ps2cbVmgNpSDfRPQ==
-
-react-native-webrtc@^111.0.6:
-  version "111.0.6"
-  resolved "https://registry.yarnpkg.com/react-native-webrtc/-/react-native-webrtc-111.0.6.tgz#dc8fdc94b2d42d960182e41d36010033811fb750"
-  integrity sha512-uxaczOCsSOe3Olzg4w9PJpK1T+Kv45aerNlcehWClvTZ3NqSebarPuKKnrd1uuFK5bb8TVvWvq5h5qZMa2pNUw==
-  dependencies:
-    base64-js "1.5.1"
-    debug "4.3.4"
-    event-target-shim "6.0.2"
 
 react-native-webview@^12.0.2:
   version "12.0.2"

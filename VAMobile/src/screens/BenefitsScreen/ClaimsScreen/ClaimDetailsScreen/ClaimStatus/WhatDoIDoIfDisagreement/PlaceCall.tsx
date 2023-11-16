@@ -1,30 +1,23 @@
-import { StackScreenProps } from '@react-navigation/stack/lib/typescript/src/types'
-import { useTranslation } from 'react-i18next'
+import {StackScreenProps} from '@react-navigation/stack/lib/typescript/src/types'
+import {useTranslation} from 'react-i18next'
 import React, {FC, useEffect, useRef, useState} from 'react'
 
-import { BenefitsStackParamList } from 'screens/BenefitsScreen/BenefitsStackScreens'
-import { Box, LargePanel, TextView } from 'components'
-import { NAMESPACE } from 'constants/namespaces'
-import { a11yHintProp } from 'utils/accessibility'
-import { a11yLabelVA } from 'utils/a11yLabel'
-import {useExternalLink, useRouteNavigation, useTheme} from 'utils/hooks'
-import getEnv from 'utils/env'
-import {JoinScreen} from "../../../../../../webrtc/JoinScreen";
-import {IncomingCallScreen} from "../../../../../../webrtc/IncomingCallScreen";
-import {OutgoingCallScreen} from "../../../../../../webrtc/OutgoingCallScreen";
-import {CallContext} from "../CallContext/CallContext";
-import {RTCPeerConnection} from "react-native-webrtc";
+import {BenefitsStackParamList} from 'screens/BenefitsScreen/BenefitsStackScreens'
+import {Box, LargePanel, TextView} from 'components'
+import {NAMESPACE} from 'constants/namespaces'
+import {a11yHintProp} from 'utils/accessibility'
+import {a11yLabelVA} from 'utils/a11yLabel'
+import {useRouteNavigation, useTheme} from 'utils/hooks'
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store";
 import {MilitaryServiceState} from "../../../../../../store/slices";
 import {useAuthorizedServices} from "../../../../../../api/authorizedServices/getAuthorizedServices";
 import {usePersonalInformation} from "../../../../../../api/personalInformation/getPersonalInformation";
-import {AcceptedCallScreen} from "../../../../../../webrtc/AcceptedCallScreen";
-import {MessagesInfo} from "../../../../../../webrtc/components/ChatScreen";
-import {getNewMessage} from "../../../../../../webrtc/communication/WebRtcChannel";
-
-
-const { LINK_URL_DECISION_REVIEWS } = getEnv()
+import {MessagesInfo} from "../../../../../../chat/screens/ChatScreen";
+import {getNewMessage} from "../../../../../../chat/communication/WebRtcChannel";
+import {JoinScreen} from "../../../../../../chat/screens/JoinScreen";
+import {OutgoingCallScreen} from "../../../../../../chat/screens/OutgoingCallScreen";
+import {AcceptedCallScreen} from "../../../../../../chat/screens/AcceptedCallScreen";
 
 type PlaceCallProps = StackScreenProps<BenefitsStackParamList, 'PlaceCall'>
 
@@ -37,15 +30,15 @@ interface ResponseBotObject {
 }
 
 
-const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
-    const { t } = useTranslation(NAMESPACE.COMMON)
+const PlaceCall: FC<PlaceCallProps> = ({route}) => {
+    const {t} = useTranslation(NAMESPACE.COMMON)
     const theme = useTheme()
-    const { claimId, claimType, claimPhase } = route.params
+    const {claimId, claimType, claimPhase} = route.params
     console.log(`route=`)
     console.log(route)
     const [type, setType] = useState('JOIN');
     const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
-    const [sendUserResponse, setSendUserResponse] = useState<MessagesInfo>({message:"", sender:""});
+    const [sendUserResponse, setSendUserResponse] = useState<MessagesInfo>({message: "", sender: ""});
     const [updateState, setUpdateState] = useState<number>(0)
     const messages = useRef<MessagesInfo[]>([]);
 
@@ -56,24 +49,23 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
     });
 
 
-
     let sourceCallerId = "1"
     let destCallerId = "800-827-1000";
-    let room="10";
+    let room = "10";
     const iceConfiguration: RTCConfiguration =
-     {
-        iceServers: [
-            {
-                urls: 'turn:jim.vmware.com:3478',
-                username: 'ejim',
-                credential: 'TannerAndTobey100!'
-            }
-        ]
-    }
+        {
+            iceServers: [
+                {
+                    urls: 'turn:jim.vmware.com:3478',
+                    username: 'ejim',
+                    credential: 'TannerAndTobey100!'
+                }
+            ]
+        }
 
-    const { mostRecentBranch, serviceHistory } = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)
-    const { data: userAuthorizedServices } = useAuthorizedServices()
-    const { data: personalInfo } = usePersonalInformation()
+    const {mostRecentBranch, serviceHistory} = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)
+    const {data: userAuthorizedServices} = useAuthorizedServices()
+    const {data: personalInfo} = usePersonalInformation()
     const accessToMilitaryInfo = userAuthorizedServices?.militaryServiceHistory && serviceHistory.length > 0
     const navigateTo = useRouteNavigation()
 
@@ -86,9 +78,7 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
         //launchExternalLink(LINK_URL_DECISION_REVIEWS, { claim_id: claimId, claim_type: claimType, claim_step: claimPhase })
     }
 
-    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(new RTCPeerConnection(iceConfiguration));
     const socket = new WebSocket('ws://10.0.0.242:8080/socket')
-    // const socket = new WebSocket('ws://192.168.64.223:8080/socket')
 
     let remoteRTCMessage = useRef<string | null>(null)
 
@@ -110,10 +100,9 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
             console.log("Else clause")
             console.log(sendUserResponse)
             let tempArray = [...messages.current];
-            if(typeof sendUserResponse === 'string') {
+            if (typeof sendUserResponse === 'string') {
                 tempArray.push({message: sendUserResponse, sender: "user"});
-            }
-            else {
+            } else {
                 tempArray.push(sendUserResponse)
             }
             console.log("tempArray=")
@@ -133,45 +122,29 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
     var done = false;
 
     function delay(ms: number): Promise<typeof setTimeout> {
-        return new Promise( resolve => setTimeout(resolve, ms) );
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
     async function checkNewMessage(): Promise {
-        for(var i = 0; i<3000 && !done; i++) {
-            // Do something before delay
-            // console.log('before delay');
-
+        for (var i = 0; i < 3000 && !done; i++) {
             await delay(1000);
-            var newMessage:string | null = getNewMessage();
-            if(newMessage != null) {
+            var newMessage: string | null = getNewMessage();
+            if (newMessage != null) {
                 console.log("checkNewMessage:  setting message to " + newMessage);
-                setSendUserResponse({message:newMessage, sender:"callcenter"})
+                setSendUserResponse({message: newMessage, sender: "callcenter"})
             }
-
-            // Do something after
-            // console.log('after delay')
         }
-        console.log("done")
     };
 
-
     useEffect(() => {
-        // load data
-        // events.push(getEvent('Event 0', 20220103, getRandomInt(1000)));
         var thread = checkNewMessage();
-
-        // Cleanup Actions
-        // return () => {
-        //     console.log("Cleaning up");
-        //     done = true;
-        // }
     }, []);
 
     socket.addEventListener("open", () => {
         console.log("web Socket got connected!!!!");
         console.log(type)
-        if(type === "OUTGOING_CALL") {
+        if (type === "OUTGOING_CALL") {
             socket.send(JSON.stringify({
                     message: "makeCall",
                     type: "CLIENT",
@@ -192,40 +165,37 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
         }
     })
 
-    // socket.addEventListener("message", (ev) => {
-    //     const data = JSON.parse(ev.data)
-    //     console.log("Overall Message = ")
-    //     console.log(data)
-    // })
-
-     const getCallScreen = (type: string, messages?: MessagesInfo[]) => {
-         switch (type) {
-             case 'JOIN':
-                 return JoinScreen({type: type, setType: setType, sourceCallerId, destCallerId, socket, peerConnection, setPeerConnection, remoteRTCMessage});
-             case 'INCOMING_CALL':
-                 return IncomingCallScreen({type, setType, sourceCallerId, destCallerId, socket, peerConnection, setPeerConnection, remoteRTCMessage});
-             case 'OUTGOING_CALL':
-                 return OutgoingCallScreen({type, setType, sourceCallerId, destCallerId, socket, peerConnection, setPeerConnection, remoteRTCMessage});
-             case 'ACCEPTED_CALL':
-                 return AcceptedCallScreen ({
-                     type,
-                     setType,
-                     sourceCallerId,
-                     destCallerId,
-                     socket,
-                     peerConnection,
-                     setPeerConnection,
-                     remoteRTCMessage,
-                     localStream: localMediaStream,
-                     setLocalStream: setLocalMediaStream,
-                     sendUserResponse,
-                     setSendUserResponse,
-                     messages})
-             default:
-                 return null;
-         }
-     }
-
+    const getCallScreen = (type: string, messages?: MessagesInfo[]) => {
+        switch (type) {
+            case 'JOIN':
+                return JoinScreen({
+                    type: type,
+                    setType: setType,
+                    sourceCallerId,
+                    destCallerId,
+                    socket,
+                    remoteRTCMessage
+                });
+            case 'OUTGOING_CALL':
+                return OutgoingCallScreen({type, setType, sourceCallerId, destCallerId, socket, remoteRTCMessage});
+            case 'ACCEPTED_CALL':
+                return AcceptedCallScreen({
+                    type,
+                    setType,
+                    sourceCallerId,
+                    destCallerId,
+                    socket,
+                    remoteRTCMessage,
+                    localStream: localMediaStream,
+                    setLocalStream: setLocalMediaStream,
+                    sendUserResponse,
+                    setSendUserResponse,
+                    messages
+                })
+            default:
+                return null;
+        }
+    }
 
 
     const text = t('claimDetails.placeCall.calling')
@@ -233,15 +203,10 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
     console.log("Before render:   messages=")
     console.log(messages.current)
     return (
-        <CallContext.Provider
-            value={{
-                peerConnection,
-                setPeerConnection
-            }}
-        >
         <LargePanel title={t('claimDetails.placeCall.pageTitle')} rightButtonText={t('close')}>
             <Box mb={theme.dimensions.contentMarginBottom} mx={theme.dimensions.gutter}>
-                <TextView key={"1"} variant="MobileBodyBold" accessibilityRole="header" accessibilityLabel={a11yLabelVA(t('claimDetails.placeCall.calling'))}>
+                <TextView key={"1"} variant="MobileBodyBold" accessibilityRole="header"
+                          accessibilityLabel={a11yLabelVA(t('claimDetails.placeCall.calling'))}>
                     {t('claimDetails.placeCall.calling')}
                 </TextView>
                 <TextView key={"2"} variant="MobileBody" paragraphSpacing={true}>
@@ -257,9 +222,8 @@ const PlaceCall: FC<PlaceCallProps> = ({ route }) => {
                     {text}
                 </TextView>
             </Box>
-           {getCallScreen(type, messages.current)}
+            {getCallScreen(type, messages.current)}
         </LargePanel>
-        </CallContext.Provider>
     )
 }
 
