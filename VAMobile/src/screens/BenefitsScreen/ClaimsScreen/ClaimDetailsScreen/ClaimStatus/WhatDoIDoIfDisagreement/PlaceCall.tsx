@@ -18,6 +18,7 @@ import {getNewMessage} from "../../../../../../chat/communication/WebRtcChannel"
 import {JoinScreen} from "../../../../../../chat/screens/JoinScreen";
 import {OutgoingCallScreen} from "../../../../../../chat/screens/OutgoingCallScreen";
 import {AcceptedCallScreen} from "../../../../../../chat/screens/AcceptedCallScreen";
+import {CallClaimDetailsScreen} from "../../../../../../chat/screens/CallClaimDetailsScreen";
 
 type PlaceCallProps = StackScreenProps<BenefitsStackParamList, 'PlaceCall'>
 
@@ -34,9 +35,8 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     const {t} = useTranslation(NAMESPACE.COMMON)
     const theme = useTheme()
     const {claimId, claimType, claimPhase} = route.params
-    console.log(`route=`)
     console.log(route)
-    const [type, setType] = useState('JOIN');
+    const [type, setType] = useState('CALL_CLAIM_DETAILS');
     const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
     const [sendUserResponse, setSendUserResponse] = useState<MessagesInfo>({message: "", sender: ""});
     const [updateState, setUpdateState] = useState<number>(0)
@@ -167,6 +167,19 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
 
     const getCallScreen = (type: string, messages?: MessagesInfo[]) => {
         switch (type) {
+            case 'CALL_CLAIM_DETAILS':
+                return CallClaimDetailsScreen({
+                    type: type,
+                    setType: setType,
+                    sourceCallerId,
+                    destCallerId,
+                    socket,
+                    remoteRTCMessage,
+                    claimId: claimId,
+                    claimType: claimType,
+                    claimPhase: claimPhase,
+                });
+                break;
             case 'JOIN':
                 return JoinScreen({
                     type: type,
@@ -204,24 +217,24 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     console.log(messages.current)
     return (
         <LargePanel title={t('claimDetails.placeCall.pageTitle')} rightButtonText={t('close')}>
-            <Box mb={theme.dimensions.contentMarginBottom} mx={theme.dimensions.gutter}>
-                <TextView key={"1"} variant="MobileBodyBold" accessibilityRole="header"
-                          accessibilityLabel={a11yLabelVA(t('claimDetails.placeCall.calling'))}>
-                    {t('claimDetails.placeCall.calling')}
-                </TextView>
-                <TextView key={"2"} variant="MobileBody" paragraphSpacing={true}>
-                    {t('claimDetails.placeCall.calling.content')}
-                </TextView>
-                <TextView
-                    key={"3"}
-                    variant="MobileBodyLink"
-                    accessibilityRole="link"
-                    {...a11yHintProp(`${text} ${t('mobileBodyLink.a11yHint')}`)}
-                    onPress={onDecisionReview}
-                    testID="ClaimsDecisionReviewOptionsTestID">
-                    {text}
-                </TextView>
-            </Box>
+            {/*<Box mb={theme.dimensions.contentMarginBottom} mx={theme.dimensions.gutter}>*/}
+            {/*    /!*<TextView key={"1"} variant="MobileBodyBold" accessibilityRole="header"*!/*/}
+                {/*          accessibilityLabel={a11yLabelVA(t('claimDetails.placeCall.calling'))}>*/}
+                {/*    {t('claimDetails.placeCall.calling')}*/}
+                {/*</TextView>*/}
+                {/*<TextView key={"2"} variant="MobileBody" paragraphSpacing={true}>*/}
+                {/*    {t('claimDetails.placeCall.calling.content')}*/}
+                {/*</TextView>*/}
+                {/*<TextView*/}
+                {/*    key={"3"}*/}
+                {/*    variant="MobileBodyLink"*/}
+                {/*    accessibilityRole="link"*/}
+                {/*    {...a11yHintProp(`${text} ${t('mobileBodyLink.a11yHint')}`)}*/}
+                {/*    onPress={onDecisionReview}*/}
+                {/*    testID="ClaimsDecisionReviewOptionsTestID">*/}
+                {/*    {text}*/}
+                {/*</TextView>*/}
+            {/*</Box>*/}
             {getCallScreen(type, messages.current)}
         </LargePanel>
     )
