@@ -23,6 +23,7 @@ type ClaimStatusProps = {
   claim: ClaimData
   /** indicates either open or closed claim */
   claimType: ClaimType
+  claims?: any[]
 }
 
 // TODO: ClaimType and ClaimTypeConstants need to be moved from ClaimsAndAppealsListView into a constants/claims file
@@ -30,7 +31,7 @@ type ClaimStatusProps = {
 /**
  * Component for rendering the details area of a claim when selected on the ClaimDetailsScreen
  */
-const ClaimStatus: FC<ClaimStatusProps> = ({ claim, claimType }) => {
+const ClaimStatus: FC<ClaimStatusProps> = ({ claim, claimType, claims }) => {
   const theme = useTheme()
   const { t } = useTranslation(NAMESPACE.COMMON)
   const navigateTo = useRouteNavigation()
@@ -128,7 +129,7 @@ const ClaimStatus: FC<ClaimStatusProps> = ({ claim, claimType }) => {
     <Box {...testIdProps('Your-claim: Status-tab-claim-details-page')}>
       <ActiveClaimStatusDetails />
       <ClosedClaimStatusDetails />
-      <NeedHelpData claimId={claim.id} claimType={claim.attributes.claimType} claimPhase={claim.attributes.phase} />
+      <NeedHelpData claimId={claim.id} claimType={claim.attributes.claimType} claimPhase={claim.attributes.phase} claims={claims} />
     </Box>
   )
 }

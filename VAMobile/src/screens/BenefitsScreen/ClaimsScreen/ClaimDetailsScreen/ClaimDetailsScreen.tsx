@@ -36,7 +36,7 @@ const ClaimDetailsScreen: FC<ClaimDetailsScreenProps> = ({ navigation, route }) 
   const controlLabels = [t('claimDetails.status'), t('claimDetails.details')]
   const [selectedTab, setSelectedTab] = useState(0)
 
-  const { claimID, claimType } = route.params
+  const { claimID, claimType, claims } = route.params
   const { data: userAuthorizedServices } = useAuthorizedServices()
   const { claim, loadingClaim, cancelLoadingDetailScreen } = useSelector<RootState, ClaimsAndAppealsState>((state) => state.claimsAndAppeals)
   const { attributes } = claim || ({} as ClaimData)
@@ -109,7 +109,7 @@ const ClaimDetailsScreen: FC<ClaimDetailsScreenProps> = ({ navigation, route }) 
           </Box>
         </Box>
         <Box mt={theme.dimensions.condensedMarginBetween}>
-          {claim && selectedTab === 0 && <ClaimStatus claim={claim || ({} as ClaimData)} claimType={claimType} />}
+          {claim && selectedTab === 0 && <ClaimStatus claim={claim || ({} as ClaimData)} claimType={claimType} claims={claims}/>}
           {claim && selectedTab === 1 && <ClaimDetails claim={claim} />}
         </Box>
       </Box>

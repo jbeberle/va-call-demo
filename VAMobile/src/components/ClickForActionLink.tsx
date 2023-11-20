@@ -47,6 +47,7 @@ export type ClaimMetaData = {
   claimId?: string
   claimType?: string
   claimPhase?: string
+  claims?: any[]
 }
 
 export type ActionLinkMetaData = CalendarMetaData
@@ -122,7 +123,7 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
     if (fireAnalytic) {
       fireAnalytic()
     }
-    const { claimId, claimType, claimPhase } = claimMetaData as ClaimMetaData
+    const { claimId, claimType, claimPhase, claims } = claimMetaData as ClaimMetaData
 
     if (linkType === LinkTypeOptionsConstants.calendar) {
       await onCalendarPress()

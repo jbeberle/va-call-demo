@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -15,13 +15,25 @@ import {useTranslation} from 'react-i18next'
 import {NAMESPACE} from "../../constants/namespaces";
 import {testIdProps} from "../../utils/accessibility";
 import theme from "../../styles/themes/standardTheme";
-import {ContentTypes, Params} from "../../store/api";
+import {
+    ClaimAndAppealData,
+    ClaimOrAppeal,
+    ClaimOrAppealConstants,
+    ContentTypes,
+    Params,
+    ScreenIDTypesConstants
+} from "../../store/api";
 import * as api from "../communication/api";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {MilitaryServiceState} from "../../store/slices";
+import {ClaimsAndAppealsState, getClaimsAndAppeals, MilitaryServiceState} from "../../store/slices";
 import {useAuthorizedServices} from "../../api/authorizedServices/getAuthorizedServices";
 import {usePersonalInformation} from "../../api/personalInformation/getPersonalInformation";
+import {
+    ClaimTypeConstants
+} from "../../screens/BenefitsScreen/ClaimsScreen/ClaimsAndAppealsListView/ClaimsAndAppealsListView";
+import {useAppDispatch} from "../../utils/hooks";
+import {capitalizeWord, formatDateMMMMDDYYYY} from "../../utils/formattingUtils";
 
 
 export type CallScreenPropType = {
@@ -48,25 +60,43 @@ const callReasonList: PickerType[] = [
     {label: 'Something Else', value: '3'},
 ];
 
-const claimList: PickerType[] = [
-    {label: 'Claim for Compensation updated on July 20, 2021', value: '1'},
-    {label: 'Claim for Dependendency update on May 05, 2021', value: '2'},
-];
-
 export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const type: string = props.type
     const setType: (type: string) => void = props.setType
     const callerId: string = props.sourceCallerId
     const otherUserId: string = props.destCallerId
-    const {claimId, claimType, claimProps} = props;
+    const {claimId, claimType, claimProps, claims} = props;
     let socket = props.socket
     const [callReason, setCallReason] = useState(null);
     const [callReasonFocus, setCallReasonFocus] = useState<boolean>(false);
     const [claim, setClaim] = useState(null);
     const [claimFocus, setClaimFocus] = useState<boolean>(false);
     const [callReasonOption, setCallReasonOption] = useState<PickerType>(callReasonList[0])
-    const [claimOption, setClaimOption] = useState<PickerType>(claimList[0])
     const {t} = useTranslation(NAMESPACE.COMMON)
+
+    const getBoldTextDisplayed = (type: ClaimOrAppeal, displayTitle: string, updatedAtDate: string): string => {
+        const formattedUpdatedAtDate = formatDateMMMMDDYYYY(updatedAtDate)
+
+
+        switch (type) {
+            case ClaimOrAppealConstants.claim:
+                console.log(displayTitle)
+                console.log(formattedUpdatedAtDate)
+                console.log(t('claims.claimFor', { displayTitle: displayTitle?.toLowerCase(), date: formattedUpdatedAtDate }))
+                return t('claims.claimFor', { displayTitle: displayTitle?.toLowerCase(), date: formattedUpdatedAtDate })
+            case ClaimOrAppealConstants.appeal:
+                return t('claims.appealFor', { displayTitle: capitalizeWord(displayTitle), date: formattedUpdatedAtDate })
+        }
+
+        return ''
+    }
+
+
+    const [claimList, setClaimList] = useState<PickerType[]>([]);
+    console.log("claims=")
+    let newClaimList = [];
+    claims.forEach((claim: any) => {console.log(claim.attributes); console.log(claim.type); newClaimList = [... newClaimList, {label: getBoldTextDisplayed(claim.type, claim.attributes.displayTitle, claim.attributes.updatedAt), value:"1"}]})
+    const [claimOption, setClaimOption] = useState<PickerType>(newClaimList[0])
     const {mostRecentBranch, serviceHistory} = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)
     const {data: userAuthorizedServices} = useAuthorizedServices()
     const {data: personalInfo} = usePersonalInformation()
@@ -75,7 +105,9 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const service = personalInfo?.signinService
     const branch = mostRecentBranch || ''
 
-    // const events: Array<ClaimEventData> = [{data:"Claim 1", type:'statuatory_opt_in'}, {data:"Claim 2", type:'hlr_other_close'}]
+    useEffect(() => {
+        setClaimList(newClaimList)
+    }, []);
 
 
     const items = [{content: <TextView>One</TextView>}, {content: <TextView>Two</TextView>}]
@@ -98,6 +130,29 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         }
     }
 
+
+    function callButtonPressed() {
+        // setType('OUTGOING_CALL');
+        console.log(`Sending:`)
+        console.log(`fullName=${fullName}`)
+        console.log(`email=${email}`)
+        console.log(`service=${service}`)
+        console.log(`branch=${branch}`)
+        console.log(`claimId=${claimId}`)
+        console.log(`claimType=${claimType}`)
+        console.log(`claimProps=${claimProps}`)
+        console.log("claims=...")
+        console.log(claims)
+        api.post('/vetcall', {
+            fullName,
+            email,
+            service,
+            branch,
+            claimId,
+            claimType,
+            claimProps
+        } as Params)
+    }
 
     return (
         <KeyboardAvoidingView
@@ -162,17 +217,8 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
                         }}>
                         <TouchableOpacity
                             onPress={() => {
-                                setType('OUTGOING_CALL');
-                                // api.post('/vetcall', {
-                                //     fullName,
-                                //     email,
-                                //     service,
-                                //     branch,
-                                //     claimId,
-                                //     claimType,
-                                //     claimProps
-                                // } as Params)
-                                }}
+                                callButtonPressed()
+                            }}
                             style={{
                                 height: 50,
                                 backgroundColor: '#5568FE',

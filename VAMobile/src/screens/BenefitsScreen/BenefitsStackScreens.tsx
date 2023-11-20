@@ -56,6 +56,7 @@ export type BenefitsStackParamList = {
     claimID: string
     claimType: string
     claimStep: number
+    claims: any[]
   }
   AppealDetailsScreen: {
     appealID: string

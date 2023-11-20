@@ -34,7 +34,7 @@ interface ResponseBotObject {
 const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     const {t} = useTranslation(NAMESPACE.COMMON)
     const theme = useTheme()
-    const {claimId, claimType, claimPhase} = route.params
+    const {claimId, claimType, claimPhase, claims} = route.params
     console.log(route)
     const [type, setType] = useState('CALL_CLAIM_DETAILS');
     const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
@@ -158,6 +158,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
                     claimId: claimId,
                     claimType: claimType,
                     claimPhase: claimPhase,
+                    claims: claims,
                     room: "10",
                     rtcMessage: "An rtcMessage",
                 })
@@ -178,6 +179,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
                     claimId: claimId,
                     claimType: claimType,
                     claimPhase: claimPhase,
+                    claims: claims,
                 });
                 break;
             case 'JOIN':
