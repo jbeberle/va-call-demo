@@ -18,7 +18,7 @@ import theme from "../../styles/themes/standardTheme";
 import {
     ClaimAndAppealData,
     ClaimOrAppeal,
-    ClaimOrAppealConstants,
+    ClaimOrAppealConstants, contentTypes,
     ContentTypes,
     Params,
     ScreenIDTypesConstants
@@ -46,6 +46,7 @@ export type CallScreenPropType = {
     sendUserResponse?: string
     setSendUserResponse?: (string) => void
     messages?: MessagesInfo[];
+    screen?: string
 }
 
 export type PickerType = {
@@ -65,6 +66,7 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const setType: (type: string) => void = props.setType
     const callerId: string = props.sourceCallerId
     const otherUserId: string = props.destCallerId
+    const screen: string = props.screen;
     const {claimId, claimType, claimProps, claims} = props;
     let socket = props.socket
     const [callReason, setCallReason] = useState(null);
@@ -117,7 +119,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         if (curSelectedRange) {
             setCallReasonOption(curSelectedRange)
             setCallReason(curSelectedRange.label)
-            // getAppointmentsInSelectedRange(curSelectedRange, 1)
         }
     }
 
@@ -126,7 +127,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         if (curSelectedRange) {
             setClaimOption(curSelectedRange)
             setClaim(curSelectedRange.label)
-            // getAppointmentsInSelectedRange(curSelectedRange, 1)
         }
     }
 
@@ -138,6 +138,7 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         console.log(`email=${email}`)
         console.log(`service=${service}`)
         console.log(`branch=${branch}`)
+        console.log(`screen=${screen}`)
         console.log(`claimId=${claimId}`)
         console.log(`claimType=${claimType}`)
         console.log(`claimProps=${claimProps}`)
@@ -148,10 +149,13 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
             email,
             service,
             branch,
+            screen,
             claimId,
             claimType,
             claimProps
-        } as Params)
+        } as Params,
+            contentTypes.applicationJson
+            )
     }
 
     return (

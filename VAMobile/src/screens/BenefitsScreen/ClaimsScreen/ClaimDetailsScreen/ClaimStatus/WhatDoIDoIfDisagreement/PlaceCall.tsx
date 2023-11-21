@@ -180,6 +180,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
                     claimType: claimType,
                     claimPhase: claimPhase,
                     claims: claims,
+                    screen: t('claimDetails.title'),
                 });
                 break;
             case 'JOIN':
