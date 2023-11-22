@@ -97,7 +97,7 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const [claimList, setClaimList] = useState<PickerType[]>([]);
     console.log("claims=")
     let newClaimList = [];
-    claims.forEach((claim: any) => {console.log(claim.attributes); console.log(claim.type); newClaimList = [... newClaimList, {label: getBoldTextDisplayed(claim.type, claim.attributes.displayTitle, claim.attributes.updatedAt), value:"1"}]})
+    claims.forEach((claim: any, index:number) => {console.log(claim.attributes); console.log(claim.type); newClaimList = [... newClaimList, {label: getBoldTextDisplayed(claim.type, claim.attributes.displayTitle, claim.attributes.updatedAt), value:index}]})
     const [claimOption, setClaimOption] = useState<PickerType>(newClaimList[0])
     const {mostRecentBranch, serviceHistory} = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)
     const {data: userAuthorizedServices} = useAuthorizedServices()
