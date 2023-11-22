@@ -18,6 +18,7 @@ export enum LinkUrlIconType {
 export const LinkTypeOptionsConstants: {
   text: LinkTypeOptions
   call: LinkTypeOptions
+  callCenter: LinkTypeOptions
   callTTY: LinkTypeOptions
   url: LinkTypeOptions
   calendar: LinkTypeOptions
@@ -27,12 +28,13 @@ export const LinkTypeOptionsConstants: {
   text: 'text',
   call: 'call',
   callTTY: 'callTTY',
+  callCenter: 'callCenter',
   url: 'url',
   calendar: 'calendar',
   directions: 'directions',
   externalLink: 'externalLink',
 }
-type LinkTypeOptions = 'text' | 'call' | 'callTTY' | 'url' | 'calendar' | 'directions' | 'externalLink'
+type LinkTypeOptions = 'text' | 'call' | 'callTTY' | 'url' | 'calendar' | 'directions' | 'externalLink' | 'callCenter'
 
 export type CalendarMetaData = {
   title: string
@@ -48,6 +50,7 @@ export type ClaimMetaData = {
   claimType?: string
   claimPhase?: string
   claims?: any[]
+  callCenterPhone?: string
 }
 
 export type ActionLinkMetaData = CalendarMetaData
@@ -123,29 +126,41 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
     if (fireAnalytic) {
       fireAnalytic()
     }
-    const { claimId, claimType, claimPhase, claims } = claimMetaData as ClaimMetaData
+    const { claimId, claimType, claimPhase, claims } = typeof claimMetaData === 'undefined'
+        ? {claimId:"0", claimType:"0", claimPhase:"0", claims:[], callCenterPhone:"0"} as ClaimMetaData
+        : claimMetaData as ClaimMetaData
 
     if (linkType === LinkTypeOptionsConstants.calendar) {
       await onCalendarPress()
       return
     }
 
+    console.log('after calendar check')
+    console.log('numberOrUrlLink=')
+    console.log(numberOrUrlLink)
+
     let openUrlText = numberOrUrlLink || ''
-    if (linkType === LinkTypeOptionsConstants.call || linkType === LinkTypeOptionsConstants.callTTY) {
+    if (linkType === LinkTypeOptionsConstants.call
+        || linkType === LinkTypeOptionsConstants.callTTY
+        || linkType === LinkTypeOptionsConstants.callCenter) {
       openUrlText = `tel:${numberOrUrlLink}`
     } else if (linkType === LinkTypeOptionsConstants.text) {
       openUrlText = `sms:${numberOrUrlLink}`
     }
 
+
     console.log(`openUrlText = ${openUrlText}`)
     console.log(`claimId = ${claimId}`)
     console.log(`claimType = ${claimType}`)
     console.log(`claimPhase = ${claimPhase}`)
-    navigateTo('PlaceCall', claimMetaData) ()
-
-    // ex. numbers: tel:${8008271000}, sms:${8008271000} (number must have no dashes)
-    // ex. url: https://google.com (need https for url)
-    // launchExternalLink(openUrlText)
+    if(linkType === LinkTypeOptionsConstants.callCenter) {
+      navigateTo('PlaceCall', claimMetaData)()
+    }
+    else {
+      // ex. numbers: tel:${8008271000}, sms:${8008271000} (number must have no dashes)
+      // ex. url: https://google.com (need https for url)
+      launchExternalLink(openUrlText)
+    }
   }
 
   const getUrlIcon = (): keyof typeof VA_ICON_MAP => {
@@ -160,6 +175,8 @@ const ClickForActionLink: FC<LinkButtonProps> = ({
   const getIconName = (): keyof typeof VA_ICON_MAP => {
     switch (linkType) {
       case 'call':
+        return 'CirclePhone'
+      case 'callCenter':
         return 'CirclePhone'
       case 'callTTY':
         return 'PhoneTTY'

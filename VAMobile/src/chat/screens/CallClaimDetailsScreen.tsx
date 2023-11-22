@@ -32,7 +32,7 @@ import {usePersonalInformation} from "../../api/personalInformation/getPersonalI
 import {
     ClaimTypeConstants
 } from "../../screens/BenefitsScreen/ClaimsScreen/ClaimsAndAppealsListView/ClaimsAndAppealsListView";
-import {useAppDispatch} from "../../utils/hooks";
+import {useAppDispatch, useExternalLink} from "../../utils/hooks";
 import {capitalizeWord, formatDateMMMMDDYYYY} from "../../utils/formattingUtils";
 
 
@@ -67,9 +67,9 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const callerId: string = props.sourceCallerId
     const otherUserId: string = props.destCallerId
     const screen: string = props.screen;
-    const {claimId, claimType, claimProps, claims} = props;
+    const {claimId, claimType, claimProps, claims, callCenterPhone} = props;
     let socket = props.socket
-    const [callReason, setCallReason] = useState(null);
+    const [callReason, setCallReason] = useState(callReasonList[0].label);
     const [callReasonFocus, setCallReasonFocus] = useState<boolean>(false);
     const [claim, setClaim] = useState(null);
     const [claimFocus, setClaimFocus] = useState<boolean>(false);
@@ -106,9 +106,11 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const email = personalInfo?.signinEmail
     const service = personalInfo?.signinService
     const branch = mostRecentBranch || ''
+    const launchExternalLink = useExternalLink()
 
     useEffect(() => {
         setClaimList(newClaimList)
+        setClaim(newClaimList[0].label)
     }, []);
 
 
@@ -150,12 +152,19 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
             service,
             branch,
             screen,
+            callReason,
+            callClaimDescription: claim,
             claimId,
             claimType,
             claimProps
         } as Params,
             contentTypes.applicationJson
             )
+        console.log(`launchExternalLink=${launchExternalLink}`)
+        console.log(`callCenterPhone=${callCenterPhone}`)
+        console.log(`callReason=${callReason}`)
+        console.log(`callClaimDescription=${claim}`)
+        launchExternalLink(callCenterPhone)
     }
 
     return (

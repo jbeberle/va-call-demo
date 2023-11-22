@@ -75,9 +75,10 @@ const NeedHelpData: FC<NeedHelpDataProps> = ({isAppeal, claimId, claimType, clai
         displayedText: displayedTextPhoneNumber(t('8008271000')),
         a11yLabel: a11yLabelID(t('8008271000')),
         numberOrUrlLink: 'http://www.google.com',
-        linkType: LinkTypeOptionsConstants.url,
+        // linkType: LinkTypeOptionsConstants.url,
+        linkType: LinkTypeOptionsConstants.callCenter,
         claimMetaData: {
-            claimId, claimType, claimPhase, claims
+            claimId, claimType, claimPhase, claims, callCenterPhone:`tel:${t('8008271000')}`
         } as ClaimMetaData,
         fireAnalytic: () => {
             if (claimId && claimType && claimPhase) {

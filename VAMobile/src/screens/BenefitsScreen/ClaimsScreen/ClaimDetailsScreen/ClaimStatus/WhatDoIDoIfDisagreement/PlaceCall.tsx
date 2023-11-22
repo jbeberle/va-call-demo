@@ -34,8 +34,11 @@ interface ResponseBotObject {
 const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     const {t} = useTranslation(NAMESPACE.COMMON)
     const theme = useTheme()
-    const {claimId, claimType, claimPhase, claims} = route.params
+    const {callCenterPhone, claimId, claimType, claimPhase, claims} = route.params
+    console.log("Route=")
     console.log(route)
+    console.log("callCenterPhone=")
+    console.log(callCenterPhone)
     const [type, setType] = useState('CALL_CLAIM_DETAILS');
     const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
     const [sendUserResponse, setSendUserResponse] = useState<MessagesInfo>({message: "", sender: ""});
@@ -75,7 +78,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     const branch = mostRecentBranch || ''
 
     const onDecisionReview = async (): Promise<void> => {
-        //launchExternalLink(LINK_URL_DECISION_REVIEWS, { claim_id: claimId, claim_type: claimType, claim_step: claimPhase })
+        //launchExternalLink(LINK_URL_DECISION_REVIEWS, { claim_id: claimId, claim_type: claimType, claim_step: claimPhase, claims callCenterPhone })
     }
 
     const socket = new WebSocket('ws://10.0.0.242:8080/socket')
@@ -159,6 +162,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
                     claimType: claimType,
                     claimPhase: claimPhase,
                     claims: claims,
+                    callCenterPhone: callCenterPhone,
                     room: "10",
                     rtcMessage: "An rtcMessage",
                 })
@@ -180,6 +184,7 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
                     claimType: claimType,
                     claimPhase: claimPhase,
                     claims: claims,
+                    callCenterPhone: callCenterPhone,
                     screen: t('claimDetails.title'),
                 });
                 break;
