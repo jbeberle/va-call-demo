@@ -8,7 +8,6 @@ import {
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
-import {MessagesInfo} from "./ChatScreen";
 import {Box, TextView, VAModalPicker} from "../../components";
 import {a11yLabelVA} from "../../utils/a11yLabel";
 import {useTranslation} from 'react-i18next'
@@ -23,7 +22,6 @@ import {
     Params,
     ScreenIDTypesConstants
 } from "../../store/api";
-import * as api from "../communication/api";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {ClaimsAndAppealsState, getClaimsAndAppeals, MilitaryServiceState} from "../../store/slices";
@@ -34,20 +32,20 @@ import {
 } from "../../screens/BenefitsScreen/ClaimsScreen/ClaimsAndAppealsListView/ClaimsAndAppealsListView";
 import {useAppDispatch, useExternalLink} from "../../utils/hooks";
 import {capitalizeWord, formatDateMMMMDDYYYY} from "../../utils/formattingUtils";
+import * as api from "../communication/api";
 
 
 export type CallScreenPropType = {
     type: string,
     setType: (type: string) => void;
-    sourceCallerId: string
-    destCallerId: string
-    socket: WebSocket
-    remoteRTCMessage: React.MutableRefObject<null>;
-    sendUserResponse?: string
-    setSendUserResponse?: (string) => void
-    messages?: MessagesInfo[];
+    claimId: string,
+    claimType: string,
+    claimPhase: string,
+    claims: string[],
+    callCenterPhone: string,
     screen?: string
 }
+
 
 export type PickerType = {
     label: string
@@ -64,14 +62,12 @@ const callReasonList: PickerType[] = [
 export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
     const type: string = props.type
     const setType: (type: string) => void = props.setType
-    const callerId: string = props.sourceCallerId
-    const otherUserId: string = props.destCallerId
-    const screen: string = props.screen;
-    const {claimId, claimType, claimProps, claims, callCenterPhone} = props;
+    const screen: string = props.screen!;
+    const {claimId, claimType, claimPhase, claims, callCenterPhone} = props;
     let socket = props.socket
-    const [callReason, setCallReason] = useState(callReasonList[0].label);
+    const [callReason, setCallReason] = useState<PickerType[]>(callReasonList[0].label);
     const [callReasonFocus, setCallReasonFocus] = useState<boolean>(false);
-    const [claim, setClaim] = useState(null);
+    const [claim, setClaim] = useState<string>(null);
     const [claimFocus, setClaimFocus] = useState<boolean>(false);
     const [callReasonOption, setCallReasonOption] = useState<PickerType>(callReasonList[0])
     const {t} = useTranslation(NAMESPACE.COMMON)
@@ -134,7 +130,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
 
 
     function callButtonPressed() {
-        // setType('OUTGOING_CALL');
         console.log(`Sending:`)
         console.log(`fullName=${fullName}`)
         console.log(`email=${email}`)
@@ -143,7 +138,7 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         console.log(`screen=${screen}`)
         console.log(`claimId=${claimId}`)
         console.log(`claimType=${claimType}`)
-        console.log(`claimProps=${claimProps}`)
+        console.log(`claimPhase=${claimPhase}`)
         console.log("claims=...")
         console.log(claims)
         api.post('/vetcall', {
@@ -156,7 +151,7 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
             callClaimDescription: claim,
             claimId,
             claimType,
-            claimProps
+            claimPhase
         } as Params,
             contentTypes.applicationJson
             )
