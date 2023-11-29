@@ -28,10 +28,6 @@ const PlaceCall: FC<PlaceCallProps> = ({route}) => {
     const {t} = useTranslation(NAMESPACE.COMMON)
     const theme = useTheme()
     const {callCenterPhone, claimId, claimType, claimPhase, claims} = route.params
-    console.log("Route=")
-    console.log(route)
-    console.log("callCenterPhone=")
-    console.log(callCenterPhone)
     const [type, setType] = useState('CALL_CLAIM_DETAILS');
 
     const {mostRecentBranch, serviceHistory} = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)

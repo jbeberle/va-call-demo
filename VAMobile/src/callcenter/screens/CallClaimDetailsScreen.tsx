@@ -78,9 +78,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
 
         switch (type) {
             case ClaimOrAppealConstants.claim:
-                console.log(displayTitle)
-                console.log(formattedUpdatedAtDate)
-                console.log(t('claims.claimFor', { displayTitle: displayTitle?.toLowerCase(), date: formattedUpdatedAtDate }))
                 return t('claims.claimFor', { displayTitle: displayTitle?.toLowerCase(), date: formattedUpdatedAtDate })
             case ClaimOrAppealConstants.appeal:
                 return t('claims.appealFor', { displayTitle: capitalizeWord(displayTitle), date: formattedUpdatedAtDate })
@@ -91,9 +88,8 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
 
 
     const [claimList, setClaimList] = useState<PickerType[]>([]);
-    console.log("claims=")
     let newClaimList = [];
-    claims.forEach((claim: any, index:number) => {console.log(claim.attributes); console.log(claim.type); newClaimList = [... newClaimList, {label: getBoldTextDisplayed(claim.type, claim.attributes.displayTitle, claim.attributes.updatedAt), value:index}]})
+    claims.forEach((claim: any, index:number) => {newClaimList = [... newClaimList, {label: getBoldTextDisplayed(claim.type, claim.attributes.displayTitle, claim.attributes.updatedAt), value:index}]})
     const [claimOption, setClaimOption] = useState<PickerType>(newClaimList[0])
     const {mostRecentBranch, serviceHistory} = useSelector<RootState, MilitaryServiceState>((s) => s.militaryService)
     const {data: userAuthorizedServices} = useAuthorizedServices()
@@ -130,17 +126,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
 
 
     function callButtonPressed() {
-        console.log(`Sending:`)
-        console.log(`fullName=${fullName}`)
-        console.log(`email=${email}`)
-        console.log(`service=${service}`)
-        console.log(`branch=${branch}`)
-        console.log(`screen=${screen}`)
-        console.log(`claimId=${claimId}`)
-        console.log(`claimType=${claimType}`)
-        console.log(`claimPhase=${claimPhase}`)
-        console.log("claims=...")
-        console.log(claims)
         api.post('/vetcall', {
             fullName,
             email,
@@ -155,10 +140,6 @@ export const CallClaimDetailsScreen = (props: CallScreenPropType) => {
         } as Params,
             contentTypes.applicationJson
             )
-        console.log(`launchExternalLink=${launchExternalLink}`)
-        console.log(`callCenterPhone=${callCenterPhone}`)
-        console.log(`callReason=${callReason}`)
-        console.log(`callClaimDescription=${claim}`)
         launchExternalLink(callCenterPhone)
     }
 

@@ -12,7 +12,6 @@ const doRequest = async function (
     contentType: ContentTypes = contentTypes.applicationJson,
     abortSignal?: AbortSignal,
 ): Promise<Response> {
-    console.log("in doRequest")
     const fetchObj: RequestInit = {
         method,
         credentials: 'include',
@@ -24,9 +23,6 @@ const doRequest = async function (
         // },
         // ...({ signal: abortSignal } || {}),
     }
-    console.log("1st fetchObj=")
-    console.log(fetchObj)
-    console.log(params)
 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].indexOf(method) > -1) {
         fetchObj.headers = {
@@ -35,8 +31,6 @@ const doRequest = async function (
         }
         fetchObj.body = contentType === contentTypes.multipart ? (params as unknown as FormData) : JSON.stringify(params)
     }
-    console.log("2st fetchObj=")
-    console.log(fetchObj)
 
     if (METHODS_THAT_ALLOW_PARAMS.indexOf(method) > -1) {
         if (_.keys(params).length > 0) {
@@ -54,8 +48,6 @@ const doRequest = async function (
         }
     }
 
-    console.log(`${method}ing to ${baseUrl}${endpoint}`)
-    console.log(fetchObj)
     return fetch(`${baseUrl}${endpoint}`, fetchObj).catch((error) => {console.log("An Error Occurred"); console.log(error)}).then(() => console.log("Completed fetch"))
 }
 
@@ -70,13 +62,10 @@ const call = async function <T> (
     let response
     let responseBody
     try {
-        console.log("before doRequest")
         response = await doRequest(method, baseUrl, endpoint, params, contentType, abortSignal)
     } catch (networkError) {
         // networkError coming back as `AbortError` means abortController.abort() was called
         // @ts-ignore
-        console.log("got a network error")
-        console.log(networkError)
         if (networkError?.name === 'AbortError') {
             return
         }
@@ -86,6 +75,5 @@ const call = async function <T> (
 }
 
 export const post = async function <T>(endpoint: string, params: Params = {}, contentType?: ContentTypes, abortSignal?: AbortSignal): Promise<T | undefined> {
-    console.log('posting to http://localhost:8088')
     return call<T>('http://10.0.0.242:8088', 'POST',  endpoint, params, contentType, abortSignal)
 }
