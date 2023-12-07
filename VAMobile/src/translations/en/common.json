@@ -344,6 +344,7 @@
   "claimDetails.placeCall.claimLabel":  "Claim/Appeal this call references",
   "claimDetails.placeCall.callButtonLabel": "Place Call",
   "claimDetails.placeCall.calling": "Placing Call...",
+  "claimDetails.placeCall.pleaseWait": "Thank you for your call.",
   "claimDetails.placeCall.calling.content": "A VA Representative will be with you shortly.",
   "claimInformation.loading": "Loading your claim details...",
   "claimLetters.download.error": "Letter not loaded",
